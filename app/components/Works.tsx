@@ -1,0 +1,350 @@
+'use client';
+
+import React, { useRef, useState, useEffect } from 'react';
+import CustomCursor, { CustomCursorRef } from './CustomCursor';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { fadeInUp, fadeIn, growWidth, staggerFadeInUp, counterAnimation } from '../utils/animations';
+
+const projects = [
+  {
+    id: 1,
+    title: "钛7上市全案",
+    category: "项目经理 · 监制 / 2025",
+    description:
+      "钛7上市全案视频前期筹备及拍摄，含套剪合计交付16支。项目需求80余个功能点，PPM资料400余页，于25天内完成筹备、期间拍摄并交付16条视频。其中包括1条TVC、两条格调视频、12条PV视频、一条潮改视频。",
+    image: "/taiseven.png",
+    embedUrl: "https://player.xinpianchang.com/?aid=13592348&mid=yOBl4zxWAjq7aMg0",
+    stats: [
+      { number: "16", unit: "支", label: "全案视频矩阵交付" },
+      { number: "80", unit: "余个", label: "核心功能点精准拆解" },
+      { number: "400", unit: "余页", label: "PPM前期筹备资料" },
+    ],
+  },
+  {
+    id: 2,
+    title: "腾势N8L上市全案项目",
+    category: "监制 · 制片/ 2025",
+    description:
+      "于9月22日接到需求，9月26日提交四条测试视频，四天超极限完成四条视频的筹备、拍摄、后期，并如期交付。",
+    image: "/tengshiN8L.jpg",
+    stats: [
+      { number: "4", unit: "天", label: "极限制作周期" },
+      { number: "4", unit: "支", label: "测试视频产出" },
+      { number: "100 %", unit: "", label: "如期交付履约率" },
+    ],
+  },
+  {
+    id: 3,
+    title: "仰望·U9圣诞格调视频",
+    category: "监制 / 2025",
+    image: "/yangwangU9.jpg",
+  },
+  {
+    id: 4,
+    title: "王朝·汉L秋季加推格调视频",
+    category: "监制 / 2025",
+    image: "HanL.png",
+  },
+  {
+    id: 5,
+    title: "DENZA·B8海外格调视频",
+    category: "监制 / 2025",
+    image: "denza.png",
+  },
+  {
+    id: 6,
+    title: "日本kcar展示视频",
+    category: "监制 / 2025",
+    image: "jpkcar.jpg",
+  },
+];
+
+type Project = typeof projects[number];
+
+const VideoLightbox = ({ project, onClose }: { project: Project; onClose: () => void }) => {
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  const embedUrl = 'embedUrl' in project ? project.embedUrl : undefined;
+
+  return (
+    <div
+      className="fixed inset-0 z-[9998] flex items-center justify-center"
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-neutral-950/95 backdrop-blur-sm" />
+
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-6 right-8 z-10 text-neutral-400 hover:text-neutral-50 transition-colors text-sm tracking-widest uppercase"
+      >
+        关闭 ✕
+      </button>
+
+      {/* Video container */}
+      <div
+        className="relative z-10 w-full max-w-5xl px-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="aspect-[16/9] bg-neutral-900">
+          <iframe
+            src={`${embedUrl}&autoplay=1&muted=1`}
+            allowFullScreen
+            allow="autoplay; fullscreen"
+            frameBorder="0"
+            className="w-full h-full"
+            style={{ border: 'none' }}
+          />
+        </div>
+        <div className="mt-4 flex justify-between items-start">
+          <div>
+            <h3 className="text-xl font-semibold text-neutral-50">{project.title}</h3>
+            <p className="text-neutral-500 text-sm tracking-wider uppercase mt-1">{project.category}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Works = () => {
+  const cursorRef = useRef<CustomCursorRef>(null);
+  const [lightboxProject, setLightboxProject] = useState<Project | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Animation refs
+  const sectionRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const dividerRef = useRef<HTMLDivElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const projectsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Section header animations
+    if (titleRef.current && sectionRef.current) {
+      fadeInUp(titleRef.current, {
+        duration: 0.6,
+        distance: 30,
+        trigger: sectionRef.current,
+        start: 'top 70%',
+      });
+    }
+
+    if (dividerRef.current && sectionRef.current) {
+      growWidth(dividerRef.current, {
+        duration: 0.4,
+        delay: 0.2,
+        trigger: sectionRef.current as unknown as Element,
+        start: 'top 70%',
+      });
+    }
+
+    if (subtitleRef.current && sectionRef.current) {
+      fadeIn(subtitleRef.current, {
+        duration: 0.4,
+        delay: 0.4,
+        trigger: sectionRef.current as unknown as Element,
+        start: 'top 70%',
+      });
+    }
+
+    // Project cards staggered reveal
+    if (projectsRef.current && sectionRef.current) {
+      const projectCards = projectsRef.current.querySelectorAll('.project-card');
+      staggerFadeInUp(projectCards, {
+        duration: 0.5,
+        stagger: 0.1,
+        distance: 40,
+        trigger: projectsRef.current as unknown as Element,
+        start: 'top 80%',
+      });
+    }
+
+    // Stats counter animations for project 1
+    const statsNumbers = document.querySelectorAll('.stats-number');
+    statsNumbers.forEach((numberEl, index) => {
+      const targetValue = parseInt(numberEl.textContent || '0');
+      if (targetValue > 0) {
+        counterAnimation(numberEl, {
+          from: 0,
+          to: targetValue,
+          duration: 1.0,
+          trigger: numberEl.closest('.stats-container') as unknown as Element,
+          start: 'top 80%',
+        });
+      }
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, []);
+
+  const handleMouseEnter = () => {
+    if (!isMobile) cursorRef.current?.show();
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isMobile && cursorRef.current) {
+      cursorRef.current.updatePosition(e.clientX, e.clientY);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isMobile) cursorRef.current?.hide();
+  };
+
+  const handleProjectClick = (project: Project) => {
+    if ('embedUrl' in project && project.embedUrl) {
+      setLightboxProject(project);
+    }
+  };
+
+  return (
+    <>
+      <section
+        ref={sectionRef}
+        id="works"
+        className="py-16 md:py-24 px-4 md:px-12 bg-neutral-950"
+      >
+        <CustomCursor ref={cursorRef} />
+        <div className="max-w-[1440px] mx-auto">
+          {/* Section Heading */}
+          <div className="mb-10 md:mb-24 flex flex-col items-center justify-between gap-2">
+            <h2 
+              ref={titleRef}
+              className="text-2xl md:text-4xl lg:text-5xl font-bold text-neutral-50 tracking-tight animate-element"
+              style={{ opacity: 0 }}
+            >
+              主要项目
+            </h2>
+            <div 
+              ref={dividerRef}
+              className="m-3 md:m-4 w-16 md:w-20 h-[4px] md:h-[5px] bg-primary-500 animate-element"
+              style={{ transform: 'scaleX(0)' }}
+            ></div>
+            <p 
+              ref={subtitleRef}
+              className="text-xs md:text-base text-neutral-300 font-extralight tracking-wider uppercase text-center animate-element"
+              style={{ opacity: 0 }}
+            >
+              主导比亚迪多品牌需求对接，逾30项视频项目交付
+            </p>
+          </div>
+
+          <div 
+            ref={projectsRef}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-x-16 md:gap-y-24"
+          >
+            {projects.map((project, index) => (
+              <div
+                key={project.image}
+                className={`group project-card animate-element ${index < 2 ? 'md:col-span-2' : ''}`}
+                style={{ opacity: 0 }}
+              >
+                {/* Thumbnail */}
+                <div
+                  className="relative aspect-[16/9] overflow-hidden bg-neutral-900 mb-5 md:mb-8 cursor-pointer"
+                  onMouseEnter={'embedUrl' in project && project.embedUrl ? handleMouseEnter : undefined}
+                  onMouseLeave={'embedUrl' in project && project.embedUrl ? handleMouseLeave : undefined}
+                  onMouseMove={'embedUrl' in project && project.embedUrl ? handleMouseMove : undefined}
+                  onClick={() => handleProjectClick(project)}
+                >
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Mobile-only static play button overlay */}
+                  {'embedUrl' in project && project.embedUrl && (
+                    <div className="md:hidden absolute inset-0 flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-primary-500/90 flex items-center justify-center">
+                        <svg width="20" height="20" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: '3px' }}>
+                          <polygon points="6,3 26,14 6,25" fill="white" stroke="white" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex flex-col gap-4 md:gap-6">
+                  {/* Title + description row — stacked on mobile, row on desktop */}
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 md:gap-4">
+                    <div className="flex flex-col gap-1 md:gap-2">
+                      <h3 className={`font-medium text-neutral-50 ${index < 2 ? 'text-2xl md:text-4xl' : 'text-xl md:text-2xl'}`}>
+                        {project.title}
+                      </h3>
+                      <p className="text-neutral-400 text-xs md:text-sm tracking-wider uppercase">
+                        {project.category}
+                      </p>
+                    </div>
+                    {'stats' in project ? null : (
+                      <p className="text-neutral-400 text-xs md:text-sm leading-relaxed md:max-w-2/3">
+                        {project.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Stats row — only for projects with stats */}
+                  {'stats' in project && project.stats && (
+                    <div className="stats-container grid grid-cols-3 gap-4 md:gap-8 pt-4 border-t border-neutral-800">
+                      {project.stats.map((stat, i) => (
+                        <div key={i} className="flex flex-col gap-1 md:gap-2">
+                          <div className="flex items-baseline gap-1">
+                            <span className="stats-number text-2xl md:text-5xl font-normal text-neutral-50 leading-none">
+                              {stat.number}
+                            </span>
+                            <span className="text-sm md:text-lg text-neutral-400 font-light">
+                              {stat.unit}
+                            </span>
+                          </div>
+                          <p className="text-neutral-500 text-xs md:text-sm leading-snug">
+                            {stat.label}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {lightboxProject && (
+        <VideoLightbox
+          project={lightboxProject}
+          onClose={() => setLightboxProject(null)}
+        />
+      )}
+    </>
+  );
+};
+
+export default Works;
