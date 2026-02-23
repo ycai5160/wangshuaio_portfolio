@@ -158,7 +158,7 @@ const Works = () => {
       growWidth(dividerRef.current, {
         duration: 0.4,
         delay: 0.2,
-        trigger: sectionRef.current as unknown as Element,
+        trigger: sectionRef.current,
         start: 'top 70%',
       });
     }
@@ -167,19 +167,19 @@ const Works = () => {
       fadeIn(subtitleRef.current, {
         duration: 0.4,
         delay: 0.4,
-        trigger: sectionRef.current as unknown as Element,
+        trigger: sectionRef.current,
         start: 'top 70%',
       });
     }
 
     // Project cards staggered reveal
-    if (projectsRef.current && sectionRef.current) {
+    if (projectsRef.current) {
       const projectCards = projectsRef.current.querySelectorAll('.project-card');
       staggerFadeInUp(projectCards, {
         duration: 0.5,
         stagger: 0.1,
         distance: 40,
-        trigger: projectsRef.current as unknown as Element,
+        trigger: projectsRef.current,
         start: 'top 80%',
       });
     }

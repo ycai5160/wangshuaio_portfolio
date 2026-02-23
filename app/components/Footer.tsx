@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { staggerFadeInUp, fadeInUp } from '../utils/animations';
+import { staggerFadeInUp } from '../utils/animations';
 
 const Footer = () => {
   const footerRef = useRef<HTMLElement>(null);
@@ -15,7 +15,7 @@ const Footer = () => {
     gsap.registerPlugin(ScrollTrigger);
 
     // Footer columns staggered reveal
-    if (columnsRef.current) {
+    if (columnsRef.current && footerRef.current) {
       const columns = columnsRef.current.querySelectorAll('.footer-column');
       staggerFadeInUp(columns, {
         duration: 0.6,
