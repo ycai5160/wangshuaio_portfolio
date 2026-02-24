@@ -37,6 +37,7 @@ const otherProjects = [
     title: "Stormshot",
     type: "SLG+解谜射击游戏",
     role: "策划",
+    description: "Stormshot是一款SLG+解谜射击游戏，主打美国市场，一年内收入过亿。买量素材着重展示 minigame 的休闲玩法。",
     image: "/project3.png",
   },
   {
@@ -44,6 +45,7 @@ const otherProjects = [
     title: "Dateback",
     type: "VR 游戏",
     role: "制作人",
+    description: "一款第一人称视角的疗愈型 VR 游戏，融合了叙事、解谜等元素。",
     image: "/project7.png",
   },
   {
@@ -52,6 +54,7 @@ const otherProjects = [
     type: "剧情短片",
     role: "制片",
     image: "/project5.png",
+    description: "本科毕设剧情短片《日日晴》入围荷兰 Cinekid 电影节（世界最大的儿童电影节）, 入围澳门国际微电影节（学生组）",
     embedUrl: "https://player.xinpianchang.com/?aid=12045067&amp;mid=z3Yn57pezRAwdDAa",
   },
   {
@@ -74,6 +77,7 @@ const otherProjects = [
     id: 8,  
     title: "活动运营",
     type: "内容运营",
+    description: "结合节日或特殊节点进行活动运营，分析用户对内容的偏好，负责玩法策划、提供页面视觉需求并完成搭建，多个活动获得站内外100w+点击，极大提高站内用户召回率",
     image: "/project4.png",
   },
   {
@@ -137,6 +141,7 @@ const VideoLightbox = ({ project, onClose }: { project: OtherProject; onClose: (
 const OtherProjects = () => {
   const cursorRef = useRef<CustomCursorRef>(null);
   const [lightboxProject, setLightboxProject] = useState<OtherProject | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   
   // Animation refs
   const sectionRef = useRef<HTMLElement>(null);
@@ -144,10 +149,14 @@ const OtherProjects = () => {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => cursorRef.current?.show();
-  const handleMouseLeave = () => cursorRef.current?.hide();
+  const handleMouseEnter = () => {
+    if (!isMobile) cursorRef.current?.show();
+  };
+  const handleMouseLeave = () => {
+    if (!isMobile) cursorRef.current?.hide();
+  };
   const handleMouseMove = (e: React.MouseEvent) => {
-    cursorRef.current?.updatePosition(e.clientX, e.clientY);
+    if (!isMobile) cursorRef.current?.updatePosition(e.clientX, e.clientY);
   };
 
   useEffect(() => {
@@ -191,6 +200,14 @@ const OtherProjects = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   return (
     <>
       <section 
@@ -220,7 +237,7 @@ const OtherProjects = () => {
           {/* Masonry Grid - 3 Columns */}
           <div 
             ref={gridRef}
-            className="columns-2 md:columns-2 lg:columns-3 gap-4 md:gap-8 space-y-4 md:space-y-8"
+            className="columns-2 md:columns-2 lg:columns-3 gap-8 md:gap-12 space-y-8 md:space-y-12"
           >
             {(otherProjects as OtherProject[]).map((project) => {
               const hasVideo = !!project.embedUrl;
@@ -233,9 +250,9 @@ const OtherProjects = () => {
                   {/* Image Container */}
                   <div
                     className={`relative bg-neutral-100 overflow-hidden mb-4 ${hasVideo ? 'cursor-pointer' : 'cursor-default'}`}
-                    onMouseEnter={hasVideo ? handleMouseEnter : undefined}
-                    onMouseLeave={hasVideo ? handleMouseLeave : undefined}
-                    onMouseMove={hasVideo ? handleMouseMove : undefined}
+                    onMouseEnter={hasVideo && !isMobile ? handleMouseEnter : undefined}
+                    onMouseLeave={hasVideo && !isMobile ? handleMouseLeave : undefined}
+                    onMouseMove={hasVideo && !isMobile ? handleMouseMove : undefined}
                     onClick={hasVideo ? () => setLightboxProject(project) : undefined}
                   >
                     <Image
@@ -259,6 +276,9 @@ const OtherProjects = () => {
                           <span className="text-neutral-400">·</span>
                           <span>{project.role}</span>
                         </>
+                      )}
+                      {project.description && (
+                        <span className="text-neutral-400">{project.description}</span>
                       )}
                     </div>
                   </div>

@@ -27,7 +27,7 @@ const notoSansSC = Noto_Sans_SC({
 });
 
 export const metadata: Metadata = {
-  title: "王帅鸥 | 监制 | 制片",
+  title: "王帅鸥 | 项目经理 · 监制 · 制片",
   description: "王帅鸥的个人作品集",
 };
 

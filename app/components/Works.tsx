@@ -11,56 +11,80 @@ const projects = [
     id: 1,
     title: "钛7上市全案",
     category: "项目经理 · 监制 / 2025",
-    description:
-      "钛7上市全案视频前期筹备及拍摄，含套剪合计交付16支。项目需求80余个功能点，PPM资料400余页，于25天内完成筹备、期间拍摄并交付16条视频。其中包括1条TVC、两条格调视频、12条PV视频、一条潮改视频。",
-    image: "/taiseven.png",
-    embedUrl: "https://player.xinpianchang.com/?aid=13592348&mid=yOBl4zxWAjq7aMg0",
-    stats: [
-      { number: "16", unit: "支", label: "全案视频矩阵交付" },
-      { number: "80", unit: "余个", label: "核心功能点精准拆解" },
-      { number: "400", unit: "余页", label: "PPM前期筹备资料" },
+    description: [
+      "钛7上市全案视频前期筹备及拍摄，含套剪合计交付16支。",
+      "项目需求80余个功能点，PPM资料400余页，于25天内完成筹备、期间拍摄并交付16条视频。",
+      "其中包括1条tvc、两条格调视频、12条pv视频、一条潮改视频。"
     ],
+    image: "/taiseven.png",
   },
   {
     id: 2,
     title: "腾势N8L上市全案项目",
     category: "监制 · 制片/ 2025",
-    description:
-      "于9月22日接到需求，9月26日提交四条测试视频，四天超极限完成四条视频的筹备、拍摄、后期，并如期交付。",
     image: "/tengshiN8L.jpg",
-    stats: [
-      { number: "4", unit: "天", label: "极限制作周期" },
-      { number: "4", unit: "支", label: "测试视频产出" },
-      { number: "100 %", unit: "", label: "如期交付履约率" },
-    ],
   },
   {
     id: 3,
+    title: "腾势N8L上市测试项目",
+    category: "项目经理 · 监制/ 2025",
+    description:
+     [ "于9月22日接到需求，9月26日提交四条测试视频。",
+      "四天超极限完成四条视频的筹备、拍摄、后期，并如期交付。"],
+    image: "/tengshitest.jpg",
+    embedUrl: "https://player.xinpianchang.com/?aid=13496200&amp;mid=2MmN455MjRR4X0zL",
+  },
+  {
+    id: 4,
     title: "仰望·U9圣诞格调视频",
     category: "监制 / 2025",
     image: "/yangwangU9.jpg",
   },
   {
-    id: 4,
+    id: 5,
     title: "王朝·汉L秋季加推格调视频",
     category: "监制 / 2025",
     image: "HanL.png",
   },
   {
-    id: 5,
+    id: 6,
     title: "DENZA·B8海外格调视频",
     category: "监制 / 2025",
     image: "denza.png",
   },
   {
-    id: 6,
+    id: 7,
     title: "日本kcar展示视频",
     category: "监制 / 2025",
     image: "jpkcar.jpg",
   },
 ];
 
-type Project = typeof projects[number];
+interface BaseProject {
+  id: number;
+  title: string;
+  category: string;
+  image: string;
+  embedUrl?: string;
+}
+
+interface ProjectWithDescription extends BaseProject {
+  description: string[];
+}
+
+interface ProjectWithStats extends BaseProject {
+  stats: Array<{
+    number: string;
+    unit: string;
+    label: string;
+  }>;
+}
+
+interface ProjectWithStringDescription extends BaseProject {
+  description: string;
+}
+
+type Project = ProjectWithDescription | ProjectWithStats | ProjectWithStringDescription | BaseProject;
 
 const VideoLightbox = ({ project, onClose }: { project: Project; onClose: () => void }) => {
   useEffect(() => {
@@ -263,7 +287,7 @@ const Works = () => {
             {projects.map((project, index) => (
               <div
                 key={project.image}
-                className={`group project-card animate-element ${index < 2 ? 'md:col-span-2' : ''}`}
+                className={`group project-card animate-element ${index < 3 ? 'md:col-span-2' : ''}`}
                 style={{ opacity: 0 }}
               >
                 {/* Thumbnail */}
@@ -296,40 +320,30 @@ const Works = () => {
                   {/* Title + description row — stacked on mobile, row on desktop */}
                   <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 md:gap-4">
                     <div className="flex flex-col gap-1 md:gap-2">
-                      <h3 className={`font-medium text-neutral-50 ${index < 2 ? 'text-2xl md:text-4xl' : 'text-xl md:text-2xl'}`}>
+                      <h3 className={`font-medium text-neutral-50 ${index < 3 ? 'text-2xl md:text-4xl' : 'text-xl md:text-2xl'}`}>
                         {project.title}
                       </h3>
                       <p className="text-neutral-400 text-xs md:text-sm tracking-wider uppercase">
                         {project.category}
                       </p>
                     </div>
-                    {'stats' in project ? null : (
-                      <p className="text-neutral-400 text-xs md:text-sm leading-relaxed md:max-w-2/3">
-                        {project.description}
-                      </p>
-                    )}
                   </div>
 
-                  {/* Stats row — only for projects with stats */}
-                  {'stats' in project && project.stats && (
-                    <div className="stats-container grid grid-cols-3 gap-4 md:gap-8 pt-4 border-t border-neutral-800">
-                      {project.stats.map((stat, i) => (
-                        <div key={i} className="flex flex-col gap-1 md:gap-2">
-                          <div className="flex items-baseline gap-1">
-                            <span className="stats-number text-2xl md:text-5xl font-normal text-neutral-50 leading-none">
-                              {stat.number}
-                            </span>
-                            <span className="text-sm md:text-lg text-neutral-400 font-light">
-                              {stat.unit}
-                            </span>
-                          </div>
-                          <p className="text-neutral-500 text-xs md:text-sm leading-snug">
-                            {stat.label}
-                          </p>
-                        </div>
-                      ))}
+                  {/* Description section */}
+                  {'description' in project && Array.isArray(project.description) && (
+                    <div className="pt-4 border-t border-neutral-800">
+                      <ul className="space-y-2">
+                        {(project as ProjectWithDescription).description.map((item, i) => (
+                          <li key={i} className="text-neutral-300 text-sm md:text-base leading-relaxed flex items-start gap-3">
+                            <span className="text-primary-500 mt-2 text-xs">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
+
+                 
                 </div>
               </div>
             ))}

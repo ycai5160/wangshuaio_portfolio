@@ -130,7 +130,7 @@ const Hero = () => {
               className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal tracking-[0.08em] text-neutral-900/90 leading-relaxed animate-element"
               style={{ opacity: 0 }}
             >
-              监制 <span className="text-neutral-900/30 mx-3 font-normal">/</span> 制片
+              项目经理<span className="text-neutral-900/30 mx-3 font-normal">/</span>监制 <span className="text-neutral-900/30 mx-3 font-normal">/</span> 制片
             </p>
             
             {/* Description - Tertiary Typography */}
@@ -139,7 +139,8 @@ const Hero = () => {
               className="text-sm sm:text-base md:text-lg text-neutral-600 font-light leading-loose tracking-wide animate-element"
               style={{ opacity: 0 }}
             >
-              现就职于比亚迪汽车，负责品牌宣传片、功能视频、创意短片等创意内容。拥有影视全流程的专业制作经验，并可适应AIGC工作流。
+              现就职于比亚迪汽车，负责品牌宣传片、功能视频、创意短片等创意内容。拥有影视全流程的专业制作经验，并可适应AIGC工作流。<br />
+              英语 雅思6.5｜日语 N1｜韩语 Topik2
             </p>
 
             {/* CTA Button */}
@@ -149,7 +150,7 @@ const Hero = () => {
               style={{ opacity: 0 }}
             >
               <a
-                href="/王帅鸥简历.pdf"
+                href="/王帅鸥简历0223.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 px-6 py-3 bg-primary-500 text-neutral-50 text-sm font-medium tracking-wider hover:bg-neutral-900 transition-colors duration-300"
