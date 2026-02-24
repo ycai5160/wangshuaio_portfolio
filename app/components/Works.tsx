@@ -32,13 +32,14 @@ const projects = [
      [ "于9月22日接到需求，9月26日提交四条测试视频。",
       "四天超极限完成四条视频的筹备、拍摄、后期，并如期交付。"],
     image: "/tengshitest.jpg",
-    embedUrl: "https://player.xinpianchang.com/?aid=13496200&amp;mid=2MmN455MjRR4X0zL",
+    embedUrl: "https://player.xinpianchang.com/?aid=13496200&mid=2MmN455MjRR4X0zL",
   },
   {
     id: 4,
     title: "仰望·U9圣诞格调视频",
     category: "监制 / 2025",
     image: "/yangwangU9.jpg",
+    embedUrl: "https://f.video.weibocdn.com/o0/dRn111XElx08u1fBET6M010412006JSQ0E010.mp4?label=mp4_hd&template=852x480.25.0&ori=0&ps=1BThihd3VLAY5R&Expires=1771915604&ssig=QvBp5o%2BrQa&KID=unistore,video",
   },
   {
     id: 5,
@@ -51,6 +52,7 @@ const projects = [
     title: "DENZA·B8海外格调视频",
     category: "监制 / 2025",
     image: "denza.png",
+    embedUrl: "https://player.xinpianchang.com/?aid=13523777&mid=DA96Qey2j56Qj5N0",
   },
   {
     id: 7,
@@ -87,6 +89,9 @@ interface ProjectWithStringDescription extends BaseProject {
 type Project = ProjectWithDescription | ProjectWithStats | ProjectWithStringDescription | BaseProject;
 
 const VideoLightbox = ({ project, onClose }: { project: Project; onClose: () => void }) => {
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -100,6 +105,16 @@ const VideoLightbox = ({ project, onClose }: { project: Project; onClose: () => 
   }, [onClose]);
 
   const embedUrl = 'embedUrl' in project ? project.embedUrl : undefined;
+
+  const handleVideoError = () => {
+    console.error('Video failed to load:', embedUrl);
+    setVideoError(true);
+  };
+
+  const handleVideoLoad = () => {
+    console.log('Video loaded successfully:', embedUrl);
+    setVideoLoaded(true);
+  };
 
   return (
     <div
@@ -122,15 +137,42 @@ const VideoLightbox = ({ project, onClose }: { project: Project; onClose: () => 
         className="relative z-10 w-full max-w-5xl px-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="aspect-[16/9] bg-neutral-900">
-          <iframe
-            src={`${embedUrl}&autoplay=1&muted=1`}
-            allowFullScreen
-            allow="autoplay; fullscreen"
-            frameBorder="0"
-            className="w-full h-full"
-            style={{ border: 'none' }}
-          />
+        <div className="aspect-[16/9] bg-neutral-900 relative">
+          {!videoLoaded && !videoError && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-neutral-400 text-sm">加载中...</div>
+            </div>
+          )}
+          
+          {videoError ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+              <div className="text-neutral-400 text-lg mb-2">视频加载失败</div>
+              <div className="text-neutral-500 text-sm mb-4">该视频可能不支持嵌入播放</div>
+              <a
+                href={embedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-neutral-50 text-sm font-medium hover:bg-primary-600 transition-colors"
+              >
+                在原平台观看
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 3H4C3.44772 3 3 3.44772 3 4V10C3 10.5523 3.44772 11 4 11H10C10.5523 11 11 10.5523 11 10V4C11 3.44772 10.5523 3 10 3Z" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M7 6L9 8L7 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          ) : (
+            <iframe
+              src={`${embedUrl}&autoplay=1&muted=1`}
+              allowFullScreen
+              allow="autoplay; encrypted-media; fullscreen"
+              frameBorder="0"
+              className="w-full h-full"
+              style={{ border: 'none' }}
+              onError={handleVideoError}
+              onLoad={handleVideoLoad}
+            />
+          )}
         </div>
         <div className="mt-4 flex justify-between items-start">
           <div>
@@ -292,7 +334,7 @@ const Works = () => {
               >
                 {/* Thumbnail */}
                 <div
-                  className="relative aspect-[16/9] overflow-hidden bg-neutral-900 mb-5 md:mb-8 cursor-pointer"
+                  className="relative aspect-[16/9] overflow-hidden bg-neutral-900 mb-5 md:mb-8"
                   onMouseEnter={'embedUrl' in project && project.embedUrl ? handleMouseEnter : undefined}
                   onMouseLeave={'embedUrl' in project && project.embedUrl ? handleMouseLeave : undefined}
                   onMouseMove={'embedUrl' in project && project.embedUrl ? handleMouseMove : undefined}

@@ -14,7 +14,7 @@ const otherProjects = [
     type: "商业广告",
     role: "创意、执行导演",
     image: "/project0.png",
-    embedUrl: "https://player.xinpianchang.com/?aid=12790938&amp;mid=1xNm498ZdOywEBVK",
+    embedUrl: "https://player.xinpianchang.com/?aid=12790938&mid=1xNm498ZdOywEBVK",
   },
   {
     id: 1,
@@ -22,7 +22,7 @@ const otherProjects = [
     type: "商业广告",
     role: "执行导演",
     image: "/project2.png",
-    embedUrl: "https://player.xinpianchang.com/?aid=12798817&amp;mid=Xl5M7nV930a7kKEg",
+    embedUrl: "https://player.xinpianchang.com/?aid=12798817&mid=Xl5M7nV930a7kKEg",
   },
   {
     id: 2,
@@ -30,7 +30,7 @@ const otherProjects = [
     type: "公益宣传片",
     role: "创意、执行导演",
     image: "/project1.png",
-    embedUrl: "https://player.xinpianchang.com/?aid=12791989&amp;mid=36Jm4a8RAGpwyjzB",
+    embedUrl: "https://player.xinpianchang.com/?aid=12791989&mid=36Jm4a8RAGpwyjzB",
   },
   {
     id: 3,
@@ -55,7 +55,7 @@ const otherProjects = [
     role: "制片",
     image: "/project5.png",
     description: "本科毕设剧情短片《日日晴》入围荷兰 Cinekid 电影节（世界最大的儿童电影节）, 入围澳门国际微电影节（学生组）",
-    embedUrl: "https://player.xinpianchang.com/?aid=12045067&amp;mid=z3Yn57pezRAwdDAa",
+    embedUrl: "https://player.xinpianchang.com/?aid=12045067&mid=z3Yn57pezRAwdDAa",
   },
   {
     id: 6,
@@ -99,6 +99,9 @@ const otherProjects = [
 type OtherProject = typeof otherProjects[number] & { embedUrl?: string };
 
 const VideoLightbox = ({ project, onClose }: { project: OtherProject; onClose: () => void }) => {
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', handleKey);
@@ -108,6 +111,16 @@ const VideoLightbox = ({ project, onClose }: { project: OtherProject; onClose: (
       document.body.style.overflow = '';
     };
   }, [onClose]);
+
+  const handleVideoError = () => {
+    console.error('Video failed to load:', project.embedUrl);
+    setVideoError(true);
+  };
+
+  const handleVideoLoad = () => {
+    console.log('Video loaded successfully:', project.embedUrl);
+    setVideoLoaded(true);
+  };
 
   return (
     <div className="fixed inset-0 z-[9998] flex items-center justify-center" onClick={onClose}>
@@ -119,15 +132,42 @@ const VideoLightbox = ({ project, onClose }: { project: OtherProject; onClose: (
         关闭 ✕
       </button>
       <div className="relative z-10 w-full max-w-5xl px-6" onClick={(e) => e.stopPropagation()}>
-        <div className="aspect-[16/9] bg-neutral-900">
-          <iframe
-            src={`${project.embedUrl}&autoplay=1`}
-            allowFullScreen
-            allow="autoplay; fullscreen"
-            frameBorder="0"
-            className="w-full h-full"
-            style={{ border: 'none' }}
-          />
+        <div className="aspect-[16/9] bg-neutral-900 relative">
+          {!videoLoaded && !videoError && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-neutral-400 text-sm">加载中...</div>
+            </div>
+          )}
+          
+          {videoError ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6">
+              <div className="text-neutral-400 text-lg mb-2">视频加载失败</div>
+              <div className="text-neutral-500 text-sm mb-4">该视频可能不支持嵌入播放</div>
+              <a
+                href={project.embedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-neutral-50 text-sm font-medium hover:bg-primary-600 transition-colors"
+              >
+                在原平台观看
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 3H4C3.44772 3 3 3.44772 3 4V10C3 10.5523 3.44772 11 4 11H10C10.5523 11 11 10.5523 11 10V4C11 3.44772 10.5523 3 10 3Z" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M7 6L9 8L7 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          ) : (
+            <iframe
+              src={`${project.embedUrl}&autoplay=1`}
+              allowFullScreen
+              allow="autoplay; encrypted-media; fullscreen"
+              frameBorder="0"
+              className="w-full h-full"
+              style={{ border: 'none' }}
+              onError={handleVideoError}
+              onLoad={handleVideoLoad}
+            />
+          )}
         </div>
         <div className="mt-4">
           <h3 className="text-xl font-semibold text-neutral-50">{project.title}</h3>
